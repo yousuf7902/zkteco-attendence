@@ -16,7 +16,7 @@ const { MAX_CHUNK, REQUEST_DATA, COMMANDS } = require('./constants')
 const { log } = require('./helpers/errorLog')
 
 class ZKLibUDP {
-  constructor(ip, port, timeout, inport, comm_key) {
+  constructor(ip, port, timeout, inport) {
     this.ip = ip
     this.port = port
     this.timeout = timeout
@@ -24,7 +24,6 @@ class ZKLibUDP {
     this.sessionId = null
     this.replyId = 0
     this.inport = inport
-    this.comm_key = comm_key
   }
 
   createSocket(cbError, cbClose) {
@@ -420,10 +419,6 @@ class ZKLibUDP {
     return await this.executeCmd(COMMANDS.CMD_FREE_DATA, '')
   }
 
-  async getTime() {
-		const time = await this.executeCmd(COMMANDS.CMD_GET_TIME, '');
-		return timeParser.decode(time.readUInt32LE(8));
-	}
 
   async getInfo() {
     const data = await this.executeCmd(COMMANDS.CMD_GET_FREE_SIZES, '')
@@ -435,6 +430,16 @@ class ZKLibUDP {
       }
     } catch (err) {
       return Promise.reject(err)
+    }
+  }
+
+  async getTime() {
+    try {
+      const t = await this.executeCmd(COMMANDS.CMD_GET_TIME, '')
+      return timeParser.decode(t.readUInt32LE(8));
+    }
+    catch(err){
+      return Promise.reject(err);
     }
   }
 
@@ -458,8 +463,6 @@ class ZKLibUDP {
     }
     return await this.closeSocket()
   }
-
-
 
   async getRealTimeLogs(cb = () => { }) {
     this.replyId++;

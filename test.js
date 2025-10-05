@@ -1,28 +1,23 @@
 const ZKLib = require('./zklib')
+
 const test = async () => {
+    let zkInstance = new ZKLib('10.38.62.29', 4370, 5200, 5000);
 
-
-    let zkInstance = new ZKLib('192.168.137.201', 4370, 10000, 4000, 1234, 'tcp');
     try {
-        // Create socket to machine 
-        await zkInstance.createSocket()
+        await zkInstance.createSocket();
+        console.log(await zkInstance.getInfo());
+        
+        // const users = await zkInstance.getUsers();
+        // console.log(users);
 
-
-        // Get general info like logCapacity, user counts, logs count
-        // It's really useful to check the status of device 
-        console.log(await zkInstance.getInfo())
-    } catch (e) {
+        const attendences = await zkInstance.getAttendances();
+        console.log(attendences);
+    } catch (err) {
+        console.error("❌ Error:", err);
+    } finally {
+        await zkInstance.disconnect(); // always good to close connection
+        console.log("🔌 Disconnected from device");
     }
-
-    // Disconnect the machine ( don't do this when you need realtime update :))) 
-    // const users = await zkInstance.getUsers();
-    // console.log(users.data.length);
-
-    const attendences = await zkInstance.getAttendances();
-    console.log(attendences.data);
-
-    const users = await zkInstance.getUsers();
-    console.log(users.data)
 }
 
-test()
+test();

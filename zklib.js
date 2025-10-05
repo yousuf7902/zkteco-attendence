@@ -4,16 +4,15 @@ const ZKLibUDP = require('./zklibudp')
 const { ZKError , ERROR_TYPES } = require('./zkerror')
 
 class ZKLib {
-    constructor(ip, port, timeout , inport, comm_code = 0, protocol){
-        this.connectionType = protocol
+    constructor(ip, port, timeout , inport){
+        this.connectionType = null
 
-        this.zklibTcp = new ZKLibTCP(ip,port,timeout, comm_code) 
-        this.zklibUdp = new ZKLibUDP(ip,port,timeout , inport, comm_code) 
+        this.zklibTcp = new ZKLibTCP(ip,port,timeout) 
+        this.zklibUdp = new ZKLibUDP(ip,port,timeout , inport) 
         this.interval = null 
         this.timer = null
         this.isBusy = false
         this.ip = ip
-        this.comm_code = comm_code || undefined
     }
 
     async functionWrapper (tcpCallback, udpCallback , command ){
@@ -30,6 +29,7 @@ class ZKLib {
                             this.ip
                         ))
                     }
+                       
                 }else{
                     return Promise.reject(new ZKError(
                         new Error( `Socket isn't connected !`),
@@ -78,7 +78,6 @@ class ZKLib {
               
                 try{
                     await this.zklibTcp.connect();
-                    this.zklibTcp.is_connect = true
                     console.log('ok tcp')
                 }catch(err){
                     throw err;
@@ -134,6 +133,75 @@ class ZKLib {
         )
     }
 
+    async getTime(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getTime(),
+            ()=> this.zklibUdp.getTime()
+        )
+    }
+    async getSerialNumber(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getSerialNumber()
+        )
+    }
+
+    async getDeviceVersion(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getDeviceVersion()
+        )
+    }
+    async getDeviceName(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getDeviceName()
+        )
+    }
+    async getPlatform(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getPlatform()
+        )
+    }
+    async getOS(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getOS()
+        )
+    }
+    async getWorkCode(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getWorkCode()
+        )
+    }
+    async getPIN(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getPIN()
+        )
+    }
+    async getFaceOn(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getFaceOn()
+        )
+    }
+    async getSSR(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getSSR()
+        )
+    }
+    async getFirmware(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getFirmware()
+        )
+    }
+    async setUser(uid, userid, name, password, role = 0, cardno = 0){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.setUser(uid, userid, name, password, role, cardno)
+        )
+    }
+
+    async getAttendanceSize(){
+        return await this.functionWrapper(
+            ()=> this.zklibTcp.getAttendanceSize()
+        )
+    }
+
     async getAttendances(cb){
         return await this.functionWrapper(
             ()=> this.zklibTcp.getAttendances(cb),
@@ -161,13 +229,6 @@ class ZKLib {
             ()=> this.zklibUdp.freeData()
         )
     }
-    
-	async getTime() {
-		return await this.functionWrapper(
-			() => this.zklibTcp.getTime(),
-			() => this.zklibUdp.getTime()
-		);
-	}
 
     async disableDevice(){
         return await this. functionWrapper(

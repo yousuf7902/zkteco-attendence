@@ -1,91 +1,99 @@
-# node-zklib
+# zklib-js
 
-## install 
+A JavaScript library for interacting with ZK Time & Attendance devices.
 
+## Installation
+
+```bash
+npm i zklib-js
 ```
- npm install --save node-zklib
- or yarn add node-zklib
-```
+
+## Usage
+
+### Basic Example
 
 ```javascript
+const ZKLib = require('node-zklib')
 
-const ZKLib = require('./zklib')
-const test = async () => {
-
-
-    let zkInstance = new ZKLib('10.20.0.7', 4370, 10000, 4000, 1234);
+async function test() {
+    let zkInstance = new ZKLib('192.168.1.201', 4370, 5200, 5000);
+    
     try {
-        // Create socket to machine 
+        // Create socket to machine
         await zkInstance.createSocket()
-
-
-        // Get general info like logCapacity, user counts, logs count
-        // It's really useful to check the status of device 
+        
+        // Get general info
         console.log(await zkInstance.getInfo())
+        
+        // Get users in machine
+        const users = await zkInstance.getUsers()
+        console.log(users)
+        
+        // Get attendance logs
+        const logs = await zkInstance.getAttendances()
+        console.log(logs)
+        
+        // Disconnect
+        await zkInstance.disconnect()
     } catch (e) {
         console.log(e)
-        if (e.code === 'EADDRINUSE') {
-        }
     }
-
-
-    // Get users in machine 
-    const users = await zkInstance.getUsers()
-    console.log(users)
-
-
-    // Get all logs in the machine 
-    // Currently, there is no filter to take data, it just takes all !!
-    const logs = await zkInstance.getAttendances()
-    console.log(logs)
-
-
-    const attendances = await zkInstance.getAttendances((percent, total)=>{
-        // this callbacks take params is the percent of data downloaded and total data need to download 
-    })
-
-     // YOu can also read realtime log by getRealTimelogs function
-  
-    // console.log('check users', users)
-
-    zkInstance.getRealTimeLogs((data)=>{
-        // do something when some checkin 
-        console.log(data)
-    })
-
-
-
-    // delete the data in machine
-    // You should do this when there are too many data in the machine, this issue can slow down machine 
-    zkInstance.clearAttendanceLog();
-    
-    // Get the device time
-    const getTime = await zkInstance.getTime();
-		  console.log(getTime.toString());
-
-    // Disconnect the machine ( don't do this when you need realtime update :))) 
-    await zkInstance.disconnect()
-
 }
 
 test()
-
- 
 ```
 
-- There are many function you can do just visit zk protocol to see the command and put it in executeCmd function already exist in the ZKLIB 
+### Available Functions
 
-- [This repo contain the cmd of many machine ] (https://github.com/adrobinoga/zk-protocol/blob/master/protocol.md)
+- `createSocket()`: Establish connection with the device
+- `getInfo()`: Get general device information
+- `getUsers()`: Retrieve users from the device
+- `setUser(uid, userid, name, password, role = 0, cardno = 0)`: Create a new user
+- `getAttendances(callback)`: Get all attendance logs
+- `getRealTimeLogs(callback)`: Get real-time logs
+- `getTime()`: Get current time from the device
+- `getSerialNumber()`: Get device serial number
+- `getFirmware()`: Get firmware version
+- `getPIN()`: Get device PIN
+- `getFaceOn()`: Check if face recognition is enabled
+- `getSSR()`: Get Self-Service-Recorder status
+- `getDeviceVersion()`: Get device version
+- `getDeviceName()`: Get device name
+- `getPlatform()`: Get platform version
+- `getOS()`: Get OS version
+- `getWorkCode()`: Get work code
+- `getAttendanceSize()`: Get attendance log size
+- `clearAttendanceLog()`: Clear attendance logs
+- `disconnect()`: Disconnect from the device
+
+### Custom Commands
+
+You can execute custom commands using the `executeCmd` function:
 
 ```javascript
-    async executeCmd(command, data=''){
-        return await this.functionWrapper(
-            ()=> this.zklibTcp.executeCmd(command, data),
-            ()=> this.zklibUdp.executeCmd(command , data)
-        )
-    }
+async executeCmd(command, data='') {
+    return await this.functionWrapper(
+        () => this.zklibTcp.executeCmd(command, data),
+        () => this.zklibUdp.executeCmd(command, data)
+    )
+}
 
-    // unlock the door  
-    executeCmd(CMD.CMD_UNLOCK, '')
-
+// Example: Unlock the door
+zkInstance.executeCmd(CMD.CMD_UNLOCK, '')
 ```
+
+For more commands, refer to the [ZK protocol documentation](https://github.com/adrobinoga/zk-protocol/blob/master/protocol.md).
+
+## Credits
+
+This library is based on:
+- [php_zklib](https://github.com/dnaextrim/php_zklib)
+- [node-zklib](https://github.com/caobo171/node-zklib)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+[MIT License](LICENSE)

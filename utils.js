@@ -72,14 +72,14 @@ module.exports.createTCPHeader = (command , sessionId, replyId, data)=>{
   
     buf.writeUInt16LE(command, 0);
     buf.writeUInt16LE(0, 2);
-
+  
     buf.writeUInt16LE(sessionId, 4);
     buf.writeUInt16LE(replyId, 6);
     dataBuffer.copy(buf, 8);
     
     const chksum2 = createChkSum(buf);
     buf.writeUInt16LE(chksum2, 2);
-
+      
     replyId = (replyId + 1) % USHRT_MAX;
     buf.writeUInt16LE(replyId, 6);
     
@@ -143,17 +143,18 @@ module.exports.decodeUserData72 = (userData)=>{
       return user;
 }
 
+
 module.exports.decodeRecordData40 = (recordData)=>{
     const record = {
-        userSn: recordData.readUIntLE(0, 2),
-        deviceUserId: recordData
+        userNo: recordData.readUIntLE(0, 2),
+        userEnroll: recordData
         .slice(2, 2+9)
         .toString('ascii')
         .split('\0')
         .shift(),
-        recordTime: parseTimeToDate(recordData.readUInt32LE(27)),
+        recordTime: parseTimeToDate(recordData.readUInt32LE(27)).toString(),
       }
-      return record
+      return record 
 }
 
 module.exports.decodeRecordData16 = (recordData)=>{
