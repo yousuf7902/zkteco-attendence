@@ -1,10 +1,11 @@
 {
-  "name": "zklib-js",
+  "name": "zkteco-attendence",
   "version": "1.0.0",
-  "description": "SpeedFace-V5L compatible JavaScript library for ZKTeco Time & Attendance devices. Based on node-zklib.",
-  "main": "index.js",
-  "scripts": {
-    "test": "node test.js"
+  "description": "Node.js library for ZKTeco attendance devices (SpeedFace-V5L compatible)",
+  "main": "zklib.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yousuf7902/zkteco-attendence.git"
   },
   "author": "yousufhassan04@gmail.com",
   "license": "MIT",
